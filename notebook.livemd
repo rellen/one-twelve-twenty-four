@@ -1,0 +1,77 @@
+# Erlang/OTP 24 and Elixir 1.12 Release Bonanza!
+
+## Intro
+
+May 2021 is an exciting time in the Erlang ecosystem!
+
+* May 12 saw the release of Erlang/OTP 24
+  * `BeamAsm` JIT compiler
+  * better error messages
+* Elixir 1.12 is imminent
+  * scripting improvements
+  * OTP24 integration
+  * stepped ranged
+  * additional functions in the standard library
+* Livebook
+* Axon
+
+## Livebook
+
+<img src="https://github.com/elixir-nx/livebook/raw/main/priv/static/logo-with-text.png" />
+
+* Interactive code notebook for Elixir built on Phoenix LiveView, by the Elixir Nx team
+* [https://github.com/elixir-nx/livebook](https://github.com/elixir-nx/livebook)
+
+## OTP 24
+
+```elixir
+:erlang.system_info(:otp_release)
+```
+
+### BeamAsm Just-in-Time compiler
+
+> BeamAsm provides load-time conversion of Erlang BEAM instructions into native code on x86-64. This allows the loader to eliminate any instruction dispatching overhead and also specialize each instruction on their argument types.
+
+* [https://erlang.org/doc/apps/erts/BeamAsm.html](https://erlang.org/doc/apps/erts/BeamAsm.html)
+
+* built using `AsmJit`
+
+  * [https://asmjit.com/](https://asmjit.com/)
+  * C++ JIT machine code generator
+
+```elixir
+:erlang.system_info(:emu_flavor)
+```
+
+### EEP54
+
+> Extended error information for failing BIF calls as proposed in EEP 54
+
+* foil our old nemesis, `ArgumentError`
+
+```
+iex(1)> :ets.insert(:foo, {:bar, :baz})
+** (ArgumentError) argument error
+   (stdlib 3.14.2) :ets.insert(:foo, {:bar, :baz})
+iex(1)>
+```
+
+```elixir
+:ets.insert(:foo, {:bar, :baz})
+```
+
+```elixir
+ref = :ets.new(:foo, [])
+```
+
+```elixir
+:ets.insert(ref, :bar)
+```
+
+## Elixir 1.12
+
+```elixir
+System.version()
+```
+
+## Axon
