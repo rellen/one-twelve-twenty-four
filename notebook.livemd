@@ -70,9 +70,6 @@ iex(1)>
 
 ```elixir
 ref = :ets.new(:foo, [])
-```
-
-```elixir
 :ets.insert(ref, :bar)
 ```
 
@@ -85,8 +82,22 @@ System.version()
 ### `Mix.install`
 
 ```elixir
-Mix.install([:jason])
-IO.puts(Jason.encode!(%{hello: :world}))
+{stdout, _res} =
+  System.cmd(
+    "elixir",
+    ["--eval", "IO.puts(Poison.encode!(%{hello: :world}))"],
+    stderr_to_stdout: true
+  )
+
+IO.puts(stdout)
+```
+
+```elixir
+{stdout, _res} = System.cmd("elixir",
+   ["--eval",
+    "Mix.install([:poison], force: true);IO.puts(Poison.encode!(%{hello: :world}))"]
+    ,stderr_to_stdout: true)
+IO.puts(stdout)
 ```
 
 ### `System.trap_signal/2`
