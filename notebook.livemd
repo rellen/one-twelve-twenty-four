@@ -5,7 +5,7 @@
 May 2021 is an exciting time in the Erlang ecosystem!
 
 * May 12 saw the release of Erlang/OTP 24
-  * `BeamAsm` JIT compiler
+  * BeamAsm JIT compiler
   * better error messages
 * Elixir 1.12 is imminent
   * scripting improvements
@@ -32,12 +32,20 @@ May 2021 is an exciting time in the Erlang ecosystem!
 
 > BeamAsm provides load-time conversion of Erlang BEAM instructions into native code on x86-64. This allows the loader to eliminate any instruction dispatching overhead and also specialize each instruction on their argument types.
 
-* [https://erlang.org/doc/apps/erts/BeamAsm.html](https://erlang.org/doc/apps/erts/BeamAsm.html)
+[https://erlang.org/doc/apps/erts/BeamAsm.html](https://erlang.org/doc/apps/erts/BeamAsm.html)
 
-* built using `AsmJit`
+[https://blog.erlang.org/a-first-look-at-the-jit/](https://blog.erlang.org/a-first-look-at-the-jit/)
 
-  * [https://asmjit.com/](https://asmjit.com/)
-  * C++ JIT machine code generator
+___
+
+#### Built using `AsmJit`
+
+* [https://asmjit.com/](https://asmjit.com/)
+* C++ JIT machine code generator
+
+___
+
+#### JIT is enabled by default in OTP24
 
 ```elixir
 :erlang.system_info(:emu_flavor)
@@ -72,6 +80,73 @@ ref = :ets.new(:foo, [])
 
 ```elixir
 System.version()
+```
+
+### `Mix.install`
+
+```elixir
+Mix.install([:jason])
+IO.puts(Jason.encode!(%{hello: :world}))
+```
+
+### `System.trap_signal/2`
+
+```elixir
+parent = self()
+
+System.trap_signal(:sigusr2, :id, fn ->
+  Process.send(parent, {:msg, "Got SIGUSR2"}, [])
+end)
+
+:os.cmd(String.to_charlist("kill -s USR2 #{:os.getpid()}"))
+
+receive do
+  {:msg, msg} -> IO.puts(inspect(msg))
+after
+  2000 -> IO.puts("oops")
+end
+
+System.untrap_signal(:sigusr2, :id)
+```
+
+### `Kernel.then`
+
+```elixir
+defmodule ThenTest1 do
+  defstruct [:field]
+end
+
+%{}
+|> Map.put(:field, "value")
+|> (fn map -> Kernel.struct(ThenTest1, map) end).()
+```
+
+```elixir
+defmodule ThenTest2 do
+  defstruct [:field]
+end
+
+%{}
+|> Map.put(:field, "value")
+|> then(&struct(ThenTest2, &1))
+```
+
+### `Kernal.tap`
+
+```elixir
+parent = self()
+side_effect = fn x -> Process.send(parent, {:greeting, x}, []) end
+
+"hello"
+|> tap(side_effect)
+|> String.reverse()
+|> IO.puts()
+
+receive do
+  {:greeting, greeting} -> IO.puts("Got greeting: #{inspect(greeting)}")
+after
+  2000 -> IO.puts("Oops - no greeting")
+end
 ```
 
 ## Axon
