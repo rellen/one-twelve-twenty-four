@@ -79,7 +79,7 @@ ___
 
 ```
 
-Running this benchmark on Elixir 11 w/OTP23 and comparing to 12 w/OTP24 shows ~7% speed-up
+Running this benchmark on Elixir 1.11 w/OTP23 and comparing to 1.12 w/OTP24 shows ~7% speed-up
 
 ```
 Comparison:
