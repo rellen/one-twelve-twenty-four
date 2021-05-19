@@ -81,22 +81,24 @@ System.version()
 
 ### `Mix.install`
 
-```elixir
-{stdout, _res} =
-  System.cmd(
-    "elixir",
-    ["--eval", "IO.puts(Poison.encode!(%{hello: :world}))"],
-    stderr_to_stdout: true
-  )
+call `Mix.install([deps])` in scripts to avoid requiring a Mix project
 
+```elixir
+# this is a hack to demonstrate how Mix.install works (as opposed to how to use in Livebook, scripts etc)
+code = "IO.puts(Poison.encode!(%{hello: :world}))"
+{stdout, _res} = System.cmd("elixir", ["--eval", code], stderr_to_stdout: true)
 IO.puts(stdout)
 ```
 
 ```elixir
-{stdout, _res} = System.cmd("elixir",
-   ["--eval",
-    "Mix.install([:poison], force: true);IO.puts(Poison.encode!(%{hello: :world}))"]
-    ,stderr_to_stdout: true)
+# this is a hack to demonstrate how Mix.install works (as opposed to how to use in Livebook, scripts etc)
+# in your scripts and Livebooks, just call the contents of code directly
+code = """
+Mix.install([:poison], force: true)
+IO.puts(Poison.encode!(%{hello: :world}))
+"""
+
+{stdout, _res} = System.cmd("elixir", ["--eval", code], stderr_to_stdout: false)
 IO.puts(stdout)
 ```
 
