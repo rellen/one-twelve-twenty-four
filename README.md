@@ -1,6 +1,12 @@
 # one-twelve-twenty-four
 Elixir Livebook and associated files for experimenting with new features in Elixir 1.12 and Erlang/OTP 24
 
+## Pre-requisites
+
+If you have `Nix`, `Nix Flakes`, and `direnv`, you just need to `direnv allow .` in the repo's root directory and you'll get OTP24 and Elixir 1.12 RC1 in a Nix shell.
+
+Otherwise, you need to bring your own OTP24 and Elixir 1.12.  Both should be available, for instance, on `asdf`.
+
 ## Running the Livebook notebook
 
 From the repo's root directory:
