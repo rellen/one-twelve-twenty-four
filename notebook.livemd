@@ -15,6 +15,8 @@ May 2021 is an exciting time in the Erlang ecosystem!
 * Livebook
 * Axon
 
+This Livebook and associated project files can be found at: [https://github.com/rellen/one-twelve-twenty-four](https://github.com/rellen/one-twelve-twenty-four)
+
 ## Livebook
 
 <img src="https://github.com/elixir-nx/livebook/raw/main/priv/static/logo-with-text.png" />
@@ -42,6 +44,7 @@ ___
 
 * [https://asmjit.com/](https://asmjit.com/)
 * C++ JIT machine code generator
+* chosen as it is simpler and faster than e.g. LLVM at the loss of some further optimisations
 
 ___
 
@@ -51,11 +54,44 @@ ___
 :erlang.system_info(:emu_flavor)
 ```
 
+#### JIT performance
+
+* minimal code memory increase - important for cache locality, etc
+  * anecdotally (from Robert Virding) on the order of 10% bigger
+* wildly differing speed-ups quoted based on use case
+  * collating, reviewing, and making new benchmarks is a talk in itself
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  1 list = Enum.to_list(1..10_000)
+  2 map_fun = fn i -> [i, i * i + 3 * i / (2 + i)] end
+  3
+  4 Benchee.run(
+  5   %{
+  6     "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+  7   },
+  8   # save: [path: "save.benchee", tag: "12_24"]
+  9   load: "save.benchee",
+ 10   time: 15,
+ 11   warmup: 5
+ 12 )
+
+```
+
+Running this benchmark on Elixir 11 w/OTP23 and comparing to 12 w/OTP24 shows ~7% speed-up
+
+```
+Comparison:
+map.flatten                1.56 K
+map.flatten (11_23)        1.45 K - 1.07x slower +45.29 μs
+```
+
 ### EEP54
 
 > Extended error information for failing BIF calls as proposed in EEP 54
 
-* foil our old nemesis, `ArgumentError`
+#### Obligatory example: foil our old nemesis, `ArgumentError`
 
 ```
 iex(1)> :ets.insert(:foo, {:bar, :baz})
@@ -73,6 +109,8 @@ ref = :ets.new(:foo, [])
 :ets.insert(ref, :bar)
 ```
 
+Check out the many, many wonderful changes in OTP 24 at [https://www.erlang.org/news/148](https://www.erlang.org/news/148)
+
 ## Elixir 1.12
 
 ```elixir
@@ -84,7 +122,7 @@ System.version()
 call `Mix.install([deps])` in scripts to avoid requiring a Mix project
 
 ```elixir
-# this is a hack to demonstrate how Mix.install works (as opposed to how to use in Livebook, scripts etc)
+# this is a hack to demonstrate how Mix.install works (as opposed to how to use in Livebook, scripts etc)`
 code = "IO.puts(Poison.encode!(%{hello: :world}))"
 {stdout, _res} = System.cmd("elixir", ["--eval", code], stderr_to_stdout: true)
 IO.puts(stdout)
@@ -162,4 +200,47 @@ after
 end
 ```
 
+### Stepped ranges
+
+```elixir
+1..10//2
+|> Enum.map(fn x -> x * 2 end)
+|> IO.inspect()
+
+0..10//2
+|> Enum.map(fn x -> x * 2 end)
+|> IO.inspect()
+
+:ok
+```
+
+### `.zip_with`
+
+```elixir
+Enum.zip_with([1, 2], [3, 4], fn x, y -> x + y end)
+```
+
+```elixir
+concat = Stream.concat(1..3, 4..6)
+Stream.zip_with(concat, concat, fn a, b -> a + b end) |> Enum.to_list()
+```
+
+Check out the many, many wonderful changes in Elixir 1.12 at [https://github.com/elixir-lang/elixir/releases](https://github.com/elixir-lang/elixir/releases)
+
 ## Axon
+
+Axon is the Neural Networks library for Elixir Nx that we've been waiting for!
+
+[https://github.com/elixir-nx/axon](https://github.com/elixir-nx/axon)
+
+```elixir
+Mix.install([
+  {:axon, "~> 0.1.0-dev", github: "elixir-nx/axon", branch: "main"},
+  {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true}
+])
+
+model =
+  Axon.input({nil, 784})
+  |> Axon.dense(128)
+  |> Axon.dense(10, activation: :softmax)
+```
